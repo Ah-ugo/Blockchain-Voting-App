@@ -1,11 +1,12 @@
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import "react-native-reanimated";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 import { PaperProvider } from "react-native-paper";
 import { createTamagui, TamaguiProvider, View } from "tamagui";
 import defaultConfig from "@tamagui/config/v3";
+import { StatusBar } from "expo-status-bar";
 
 const config = createTamagui(defaultConfig);
 
@@ -26,6 +27,24 @@ export default function RootLayout() {
     InterThin: require("../assets/fonts/static/Inter_24pt-Thin.ttf"),
   });
 
+  const [appIsReady, setAppIsReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      await SplashScreen.preventAutoHideAsync();
+
+      if (loaded) {
+        SplashScreen.hideAsync();
+      }
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      await SplashScreen.hideAsync();
+      setAppIsReady(true);
+    }
+
+    prepare();
+  }, []);
+
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
@@ -38,14 +57,19 @@ export default function RootLayout() {
   return (
     <PaperProvider>
       <TamaguiProvider config={config}>
-        <Stack initialRouteName="Home">
+        <StatusBar backgroundColor="transparent" />
+        <Stack>
           <Stack.Screen
             name="index"
             options={{ headerShown: false }}
-            redirect
+            // redirect
           />
-          <Stack.Screen name="Home" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="register" options={{ headerShown: false }} />
+
+          <Stack.Screen name="(app)" options={{ headerShown: false }} />
+          {/* <Stack.Screen name="[id]" options={{ headerShown: false }} /> */}
+          {/* <Stack.Screen name="+not-found" /> */}
         </Stack>
       </TamaguiProvider>
     </PaperProvider>

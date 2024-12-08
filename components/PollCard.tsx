@@ -10,9 +10,19 @@ import {
   XStack,
   YStack,
 } from "tamagui";
-import { Chainlink, Chart, Link2, Unlock } from "iconsax-react-native";
+import { Chainlink, Chart, Link2, Lock1, Unlock } from "iconsax-react-native";
+import { useRouter } from "expo-router";
+// import { router } from "expo-router";
 
-export default function PollCard() {
+export default function PollCard({
+  title,
+  description,
+  isActive,
+  total_vote,
+  url,
+  id,
+}: any) {
+  const router = useRouter();
   return (
     <Card
       elevate
@@ -32,7 +42,7 @@ export default function PollCard() {
         <SizableText
           style={{ fontSize: 20, fontFamily: "InterMedium", color: "white" }}
         >
-          Presidential Election 2020
+          {title}
         </SizableText>
 
         <Paragraph
@@ -40,7 +50,7 @@ export default function PollCard() {
           color={"lightgray"}
           style={{ fontFamily: "InterMedium" }}
         >
-          Now available
+          {description}
         </Paragraph>
       </Card.Header>
       <Card.Footer
@@ -57,11 +67,15 @@ export default function PollCard() {
         >
           <YStack>
             <XStack alignItems="center" gap={5}>
-              <Unlock size={15} color="white" />
+              {isActive ? (
+                <Unlock size={15} color="white" />
+              ) : (
+                <Lock1 size={15} color="white" />
+              )}
               <SizableText
                 style={{ color: "white", fontFamily: "InterMedium" }}
               >
-                Voting Open
+                {isActive ? "Voting Open" : "Voting Closed"}
               </SizableText>
             </XStack>
             <XStack alignItems="center" gap={5}>
@@ -69,7 +83,7 @@ export default function PollCard() {
               <SizableText
                 style={{ color: "white", fontFamily: "InterMedium" }}
               >
-                10,000 votes
+                {total_vote} votes
               </SizableText>
             </XStack>
           </YStack>
@@ -79,6 +93,7 @@ export default function PollCard() {
               borderRadius="$5"
               size={"$3"}
               style={{ fontFamily: "InterLight" }}
+              onPress={() => router.push(`/${id}`)}
             >
               Vote
             </Button>
@@ -93,7 +108,7 @@ export default function PollCard() {
             objectFit: "cover",
             borderRadius: 10,
           }}
-          src="https://images.theconversation.com/files/138571/original/image-20160921-12478-i4e5oe.jpg"
+          src={url}
         />
       </Card.Background>
     </Card>
