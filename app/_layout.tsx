@@ -4,18 +4,22 @@ import "react-native-reanimated";
 import { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 import { PaperProvider } from "react-native-paper";
-import { createTamagui, TamaguiProvider, View } from "tamagui";
+import { createTamagui, TamaguiProvider } from "tamagui";
 import defaultConfig from "@tamagui/config/v3";
 import { StatusBar } from "expo-status-bar";
+import { AuthProvider } from "@/context/AuthContext";
+import { NavigationContainer } from "./NavigationContainer";
 
 const config = createTamagui(defaultConfig);
+
+SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
   initialRouteName: "Home",
 };
 
 export default function RootLayout() {
-  const [loaded] = useFonts({
+  const [fontsLoaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     InterBlack: require("../assets/fonts/static/Inter_24pt-Black.ttf"),
     InterBold: require("../assets/fonts/static/Inter_24pt-Bold.ttf"),
@@ -28,50 +32,31 @@ export default function RootLayout() {
   });
 
   const [appIsReady, setAppIsReady] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => setIsLoggedIn(true);
 
   useEffect(() => {
-    async function prepare() {
-      await SplashScreen.preventAutoHideAsync();
-
-      if (loaded) {
+    const prepare = async () => {
+      if (fontsLoaded) {
+        await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate initialization delay
+        setAppIsReady(true);
         SplashScreen.hideAsync();
       }
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      await SplashScreen.hideAsync();
-      setAppIsReady(true);
-    }
-
+    };
     prepare();
-  }, []);
+  }, [fontsLoaded]);
 
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+  if (!appIsReady) return null;
 
-  if (!loaded) {
-    return null;
-  }
   return (
-    <PaperProvider>
-      <TamaguiProvider config={config}>
-        <StatusBar backgroundColor="transparent" />
-        <Stack>
-          <Stack.Screen
-            name="index"
-            options={{ headerShown: false }}
-            // redirect
-          />
-          <Stack.Screen name="login" options={{ headerShown: false }} />
-          <Stack.Screen name="register" options={{ headerShown: false }} />
-
-          <Stack.Screen name="(app)" options={{ headerShown: false }} />
-          {/* <Stack.Screen name="[id]" options={{ headerShown: false }} /> */}
-          {/* <Stack.Screen name="+not-found" /> */}
-        </Stack>
-      </TamaguiProvider>
-    </PaperProvider>
+    <AuthProvider>
+      <PaperProvider>
+        <TamaguiProvider config={config}>
+          <StatusBar backgroundColor="transparent" />
+          <NavigationContainer />
+        </TamaguiProvider>
+      </PaperProvider>
+    </AuthProvider>
   );
 }

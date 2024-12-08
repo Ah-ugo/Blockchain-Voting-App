@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Alert } from "react-native";
 import axios from "axios";
 import {
@@ -13,12 +13,15 @@ import {
 import { Link, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useLocalSearchParams } from "expo-router";
+import { AuthContext } from "@/context/AuthContext";
 
 export default function SignIn() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const { setIsLoggedIn } = useContext(AuthContext);
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -46,16 +49,17 @@ export default function SignIn() {
           },
         }
       );
-      console.log(response.data);
+
       const { access_token, token_type, profile_picture_url } = response.data;
 
-      // Save the token and profile picture URL to AsyncStorage
+      // Save credentials to AsyncStorage
       await AsyncStorage.setItem("accessToken", access_token);
       await AsyncStorage.setItem("tokenType", token_type);
       await AsyncStorage.setItem("profilePictureUrl", profile_picture_url);
 
-      // Navigate to the home screen
-      router.replace("/(app)/Home");
+      // Mark user as logged in
+      setIsLoggedIn(true);
+      router.replace("/Home");
     } catch (error) {
       console.error(error);
       Alert.alert("Login Failed", "Invalid username or password.");
@@ -87,7 +91,6 @@ export default function SignIn() {
         </SizableText>
       </View>
       <View>
-        {/* Username Input */}
         <YStack>
           <Label htmlFor="username" style={{ fontFamily: "InterLight" }}>
             Username
@@ -102,7 +105,6 @@ export default function SignIn() {
           />
         </YStack>
 
-        {/* Password Input */}
         <YStack>
           <Label htmlFor="password" style={{ fontFamily: "InterLight" }}>
             Password
@@ -118,7 +120,6 @@ export default function SignIn() {
           />
         </YStack>
 
-        {/* Login Button */}
         <Button
           onPress={handleLogin}
           color={"white"}
@@ -131,7 +132,6 @@ export default function SignIn() {
           {loading ? "Signing In..." : "Sign In"}
         </Button>
 
-        {/* Separator */}
         <XStack marginTop={20} alignItems="center" gap={10}>
           <Separator borderColor={"#AEACAC"} />
           <SizableText
@@ -144,7 +144,6 @@ export default function SignIn() {
           <Separator borderColor={"#AEACAC"} />
         </XStack>
 
-        {/* Sign Up Link */}
         <View
           style={{
             display: "flex",

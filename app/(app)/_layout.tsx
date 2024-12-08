@@ -40,11 +40,11 @@ export default function RootLayout() {
     <PaperProvider>
       <TamaguiProvider config={config}>
         <StatusBar backgroundColor="transparent" />
-        <Stack initialRouteName="Home">
+        <Stack>
           <Stack.Screen
             name="index"
             options={{ headerShown: false }}
-            redirect
+            // redirect
           />
           {/* <Stack.Screen name="register" options={{ headerShown: false }} /> */}
           {/* <Stack.Screen name="login" options={{ headerShown: false }} /> */}
